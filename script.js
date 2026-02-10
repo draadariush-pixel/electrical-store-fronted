@@ -589,7 +589,7 @@ ${notes || "Байхгүй"}
   if(!elements.cartSection.classList.contains('hidden')) toggleCart();
 }
 function sendTelegramMessage(message) {
-  fetch("http://localhost:3000/send", {
+  fetch("https://electrical-store-backend.onrender.com/send", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -606,6 +606,7 @@ function sendTelegramMessage(message) {
     alert("Алдаа гарлаа ❌ Console шалгана уу");
   });
 }
+
 
 document.getElementById("orderBtn").addEventListener("click", function () {
   console.log("Захиалга илгээх товч дарлаа ✅");
