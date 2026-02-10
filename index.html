@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>JUGGERNAUT ELECTRIC LLC — Цахилгаан тоног төхөөрөмж</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-container">
+      <div class="logo">
+        <h1>⚡ JUGGERNAUT ELECTRIC LLC</h1>
+        <p class="tagline">Цахилгаанчидад зориулсан мэргэжлийн тоног хэрэгсэл</p>
+        <p class="subtitle">Та манай дэлгүүрээс худалдан авалт хийгээд мэргэжлийн цахилгаанчинтай үнэ тохирч суурилуулалт , угсралт хийлгэх боломжтой</p>
+      </div>
+      <div class="header-phones">
+        <a href="tel:+976-86-999-128" class="phone-link">☎ +976 86-999-128</a>
+        <a href="tel:+976-88-222-803" class="phone-link">☎ +976 88-222-803</a>
+      </div>
+      <button id="cartBtn" class="cart-btn" aria-label="Сагс" type="button">
+        <span class="cart-figure" aria-hidden="true">
+          <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="22" height="22">
+            <circle cx="9" cy="21" r="1"></circle>
+            <circle cx="20" cy="21" r="1"></circle>
+            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+          </svg>
+        </span>
+        <span class="cart-label" data-i18n="cart_title">Сагс</span>
+        <span id="cartCount" class="cart-count">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="section products-section" id="productsSection">
+      <div class="section-header">
+        <h2 data-i18n="products_title">Бүтээгдэхүүн</h2>
+        <p class="section-subtitle" data-i18n="products_subtitle">Мэргэжлийн цахилгаан тоног төхөөрөмж</p>
+      </div>
+      <div id="productsGrid" class="products-grid"></div>
+    </section>
+
+    <aside id="cartSection" class="section cart-section hidden" aria-hidden="true">
+      <div class="section-header">
+        <h2>Худалдан авах сагс</h2>
+        <button id="closeCartBtn" class="close-cart-btn">✕</button>
+      </div>
+
+      <div id="emptyCartMessage" class="empty-cart-message">
+        <p data-i18n="cart_empty">Таны сагс хоосон байна</p>
+        <button id="continueShopping" class="btn btn-primary" data-i18n="continue_shopping">Үргэлжлүүлэн худалдан авах</button>
+      </div>
+
+      <div id="cartContent" class="cart-content hidden">
+        <div id="cartItems" class="cart-items"></div>
+
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span data-i18n="subtotal_label">Нийт үнэ:</span>
+            <span id="subtotalAmount">₮0.00</span>
+          </div>
+          <div class="summary-row">
+            <span>Хүргэлт:</span>
+            <span id="deliveryAmount">₮5,000.00</span>
+          </div>
+          <div class="summary-row total">
+            <span data-i18n="total_label">Нийт дүн:</span>
+            <span id="totalAmount">₮0.00</span>
+          </div>
+          <button id="checkoutBtn" class="btn btn-primary btn-full" data-i18n="checkout">Төлбөрийн үе шатанд очих</button>
+          <button id="continueShopping2" class="btn btn-secondary btn-full" data-i18n="continue_shopping">Үргэлжлүүлэн худалдан авах</button>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <p>&copy; 2026 JUGGERNAUT ELECTRIC LLC</p>
+    </div>
+  </footer>
+
+  <!-- Төлбөрийн modal диалог -->
+  <div id="paymentModal" class="modal hidden">
+    <div class="modal-content">
+      <button id="closePaymentModal" class="modal-close">✕</button>
+      
+        <div class="customer-info-section">
+          <h3>Хүргэлтийн мэдээлэл</h3>
+          <div class="form-group">
+            <label for="nameInput">Захиалагчийн нэр:</label>
+            <input type="text" id="nameInput" placeholder="Овог Нэр" required>
+          </div>
+          <div class="form-group">
+            <label for="phoneInput">Утасны дугаар:</label>
+            <input type="tel" id="phoneInput" placeholder="+976 XX XXX XXX" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="addressInput">Хүргэлтийн хаяг:</label>
+            <input type="text" id="addressInput" placeholder="дүүрэг, хороо, байрь тоот" required>
+          </div>
+          
+          <div class="form-group">
+            <label for="notesInput">Нэмэлт мэдээлэл:</label>
+            <textarea id="notesInput" placeholder="орцны код, нэмэлт утасны дугаар гэх мэт..." rows="3"></textarea>
+          </div>
+        </div>
+        <h2>Төлбөрийн мэдээлэл</h2>
+      
+      <form id="paymentForm">
+        <div class="payment-summary">
+          <div class="summary-row">
+            <span>Нийт үнэ:</span>
+            <span id="modalSubtotal">₮0.00</span>
+          </div>
+          <div class="summary-row">
+            <span>Хүргэлт:</span>
+            <span id="modalDelivery">₮5,000.00</span>
+          </div>
+          <div class="summary-row total">
+            <span>Төлөх дүн:</span>
+            <span id="modalTotal">₮0.00</span>
+          </div>
+        </div>
+
+        <button id="orderBtn" type="button" class="btn btn-primary btn-full">
+  Захиалга илгээх
+</button>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- QR код болон банкны apps -->
+  <div id="qrModal" class="modal hidden">
+    <div class="modal-content qr-modal-content">
+      <button id="closeQrModal" class="modal-close">✕</button>
+      <h2>Төлбөрийн сонголт</h2>
+      
+      <div class="qr-container">
+        <div class="qr-section">
+          <p>⚠️ Та өөрийн банкны аппаар нэвтэрч дараах дансаар гүйлгээ хийнэ үү</p>
+          <p>Төлбөрөө шилжүүлж дуусаад та ГҮЙЛГЭЭ ХИЙСЭН гэх цэсрүү дар </p>
+          <div id="qrCodeCanvas"></div>
+        </div>
+        
+        <div class="qr-section">
+          <h3>ХАС банк </h3>
+          <div class="bank-account-info">
+            <div class="account-info-field">
+              <label>IBAN:</label>
+              <div class="account-info-value-with-copy">
+                <code id="qrAccountIban">MN230032005006123913</code>
+                <button type="button" class="copy-btn-sm" data-copy="qrAccountIban" title="Хуулах">📋</button>
+              </div>
+            </div>
+            <div class="account-info-field">
+              <label>Данс эзэмшигч:</label>
+              <code id="qrAccountHolder">ЖАГГЕРНАУТ ЭЛЕКТРИК ХХК</code>
+            </div>
+            <div class="account-info-field">
+              <label>Гүйлгээний утга:</label>
+              <code id="qrTransferNote">Утасны дугаар</code>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="completePayment" class="btn btn-primary btn-full">Гүйлгээ хийсэн</button>
+      </div>
+    </div>
+  </div>
+
+      <!-- Төлбөр баталгаажуулалтын мэдэгдэл -->
+      <div id="confirmModal" class="modal hidden">
+        <div class="modal-content">
+          <button id="closeConfirmModal" class="modal-close">✕</button>
+          <h2>Төлбөр баталгаажих тухай</h2>
+          
+          <p id="confirmText">Төлбөр баталгаажихад 5-10 минут зарцуулагдах ба баталгаажсны дараа таны утсанд SMS илгээгдэх болно.</p>
+          <div class="modal-actions">
+            <button id="confirmOkBtn" class="btn btn-primary btn-full">Хаах</button>
+          </div>
+        </div>
+      </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
+
