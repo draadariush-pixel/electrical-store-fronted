@@ -1007,9 +1007,23 @@ function fuzzyMatch(query, text) {
 function scrollToProduct(productId) {
   const productCard = document.querySelector(`[data-product-id="${productId}"]`);
   if (productCard) {
+    console.log(`✨ Бүтээгдэхүүн #${productId} руу скролл хийж байна...`);
+    
+    // Скролл хийх
     productCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    // Гэрэлтүүлэх эффект
-    productCard.style.animation = 'highlight 1s ease';
+    
+    // Гэрэлтүүлэх эффект - класс нэмэх (CSS анимайшен хамрах)
+    productCard.classList.add('highlight-product');
+    
+    // 2 секундын дараа гэрэлтүүлэлт авах
+    setTimeout(() => {
+      productCard.classList.remove('highlight-product');
+      console.log(`✅ Бүтээгдэхүүн #${productId} гэрэлтүүлэлт дуусав`);
+    }, 2000);
+    
+    // Бүтээгдэхүүнд фокус өгөх (accessibility)
+    productCard.focus();
+    productCard.setAttribute('tabindex', '-1');
   } else {
     console.warn(`❌ Бүтээгдэхүүн #${productId} олдсонгүй`);
   }
