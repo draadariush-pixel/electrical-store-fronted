@@ -1,3 +1,4 @@
+
 console.log("script.js ачааллаа ✅");
 
 function formatPrice(num){
@@ -521,34 +522,26 @@ function completePayment(){
   `• ${item.name} x${item.quantity} = ₮${formatPrice(item.price * item.quantity)}`
 ).join("\n");
 
-  const orderId = "ORD-" + Date.now();
-
-const message = `
-━━━━━━━━━━━━━━━━━━
-🛒 *ШИНЭ ЗАХИАЛГА*
-━━━━━━━━━━━━━━━━━━
-🆔 Захиалгын ID: ${orderId}
+  const message = `
+⚠️ Та байгууллагын дансанд төлбөр төлөгдсөн эсэхийг шалган баталгаажуулна уу!
 
 👤 Захиалагч: ${appState.customerInfo?.name || "Нэр оруулаагүй"}
+
+💳 Төлбөр дуусав!
+
 📞 Утас: ${phone}
-📍 Хаяг: ${address}
+📍 Хүргэлтийн хаяг: ${address}
 
-━━━━━━━━━━━━━━━━━━
-📦 *ЗАХИАЛСАН БАРАА*
-${productList}
-
-━━━━━━━━━━━━━━━━━━
-📊 Нийт ширхэг: ${appState.cart.reduce((s,i)=>s+i.quantity,0)}
-💰 Барааны үнэ: ₮${formatPrice(subtotal)}
-🚚 Хүргэлт: ₮${formatPrice(delivery)}
-✅ *Нийт төлөх дүн*: ₮${formatPrice(total)}
-
-━━━━━━━━━━━━━━━━━━
 📝 Нэмэлт мэдээлэл:
 ${notes || "Байхгүй"}
 
-⚠️ Төлбөрийг шалгаад баталгаажуулна уу!
-━━━━━━━━━━━━━━━━━━
+📦 Захиалсан бүтээгдэхүүн:
+${productList}
+
+📊 Нийт ширхэг: ${appState.cart.reduce((s,i)=>s+i.quantity,0)}
+💰 Барааны үнэ: ₮${formatPrice(subtotal)}
+🚚 Хүргэлт: ₮${formatPrice(delivery)}
+✅ Төлөх дүн: ₮${formatPrice(total)}
 `;
 
   sendTelegramMessage(message);
@@ -594,19 +587,18 @@ function sendTelegramMessage(message) {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ text: message })
+    body: JSON.stringify({ message }) // 
   })
   .then(res => res.json())
   .then(data => {
-    console.log("Telegram OK:", data);
+    console.log("Render OK:", data);
     alert("Захиалга амжилттай илгээгдлээ ✅");
   })
   .catch(err => {
-    console.error("Telegram ERROR:", err);
+    console.error("Render ERROR:", err);
     alert("Алдаа гарлаа ❌ Console шалгана уу");
   });
 }
-
 
 document.getElementById("orderBtn").addEventListener("click", function () {
   console.log("Захиалга илгээх товч дарлаа ✅");
@@ -631,15 +623,5 @@ document.getElementById("orderBtn").addEventListener("click", function () {
   showQRModal();
   document.getElementById("qrModal").classList.remove("hidden");
 });
-fetch("https://electrical-store-backend.onrender.com/send", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    text: "Сайн байна, шинэ захиалга ирлээ!"
-  })
-})
-.then(res => res.json())
-.then(data => console.log(data));
+
 
