@@ -1045,6 +1045,10 @@ function setupSearchListeners() {
   const searchInput = document.getElementById('searchInput');
   const searchResults = document.getElementById('searchResults');
   
+  console.log('🔍 setupSearchListeners идэвхжүүлсэн');
+  console.log('searchInput:', searchInput);
+  console.log('searchResults:', searchResults);
+  
   if (!searchInput || !searchResults) {
     console.error('❌ Хайлтын элементүүд олдсонгүй');
     return;
@@ -1053,8 +1057,16 @@ function setupSearchListeners() {
   searchInput.addEventListener('input', (e) => {
     const query = e.target.value.trim();
     
+    console.log('🔍 Хайлтын утга:', query);
+    console.log('Products массив:', products);
+    
     if (query.length === 0) {
       searchResults.classList.add('hidden');
+      return;
+    }
+    
+    if (!products || products.length === 0) {
+      console.error('❌ Products массив хоосон');
       return;
     }
     
@@ -1064,6 +1076,8 @@ function setupSearchListeners() {
       const descScore = fuzzyMatch(query, product.description);
       const score = Math.max(nameScore, descScore);
       
+      console.log(`Product: ${product.name} | Name score: ${nameScore} | Desc score: ${descScore} | Final: ${score}`);
+      
       return {
         product: product,
         score: score
@@ -1071,6 +1085,8 @@ function setupSearchListeners() {
     })
     .filter(item => item.score >= 0) // матч байгаа зүйлсийг авах
     .sort((a, b) => b.score - a.score); // оноогоор эрэмбэлэх
+    
+    console.log(`📊 Хайлтын үр дүн: ${filtered.length} ширхэг`);
     
     if (filtered.length === 0) {
       searchResults.innerHTML = '<div class="search-result-item" style="text-align: center; color: var(--muted);">Бүтээгдэхүүн олдсонгүй</div>';
@@ -1121,6 +1137,6 @@ function setupSearchListeners() {
     }
   });
   
-  console.log('✅ Хайлт функцыг идэвхжүүлсэн: Бүтээгдэхүүнээр хайх бололцоотой');
+  console.log('✅ Хайлт функцыг бүрэн идэвхжүүлсэн');
 }
 
