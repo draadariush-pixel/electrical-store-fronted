@@ -1045,7 +1045,7 @@ function setupSearchListeners() {
     searchResults.innerHTML = filtered.map(item => `
       <div class="search-result-item" onclick="scrollToProduct(${item.product.id}); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('searchInput').value = '';">
         <div class="search-result-name">${item.product.name}</div>
-        <div class="search-result-price">₩${item.product.price.toLocaleString('mn-MN')}</div>
+        <div class="search-result-price">₮${item.product.price.toLocaleString('mn-MN')}</div>
       </div>
     `).join('');
     
