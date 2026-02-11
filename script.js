@@ -673,13 +673,14 @@ function sendTelegramMessage(message, callback) {
   const phone = (document.getElementById('phoneInput') || {}).value || '';
   const name = appState.customerInfo?.name || '';
   const address = appState.customerInfo?.address || '';
+  const telegramId = (document.getElementById('telegramIdInput') || {}).value || '';
   
   fetch("https://electrical-store-backend.onrender.com/send-telegram", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"  
     },
-    body: JSON.stringify({ message: message, orderId: orderId, phone: phone, name: name, address: address })  
+    body: JSON.stringify({ message: message, orderId: orderId, phone: phone, name: name, address: address, telegramId: telegramId })  
   })
   .then(res => res.json())
   .then(data => {
