@@ -946,3 +946,25 @@ function displayTrackingInfo(order) {
   }
 }
 
+// ========== Back to Top Button Functionality ==========
+const backToTopBtn = document.getElementById('backToTopBtn');
+
+// Үзэгдэх үеэр товчны үзэгдэх эсэхийг шалгах
+window.addEventListener('scroll', () => {
+  if (window.pageYOffset > 300) {
+    backToTopBtn.classList.add('show');
+  } else {
+    backToTopBtn.classList.remove('show');
+  }
+});
+
+// Back to Top товчны клик эвент
+backToTopBtn.addEventListener('click', () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+});
+
+console.log('✅ Мобиль функцыг нэмсэн: Back to Top кнопка идэвхтэй байна');
+
