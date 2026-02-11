@@ -1062,12 +1062,23 @@ function setupSearchListeners() {
     `).join('');
     
     // Үр дүнгийн дээр event listener нэмэх
-    document.querySelectorAll('.search-result-item').forEach(item => {
-      item.addEventListener('click', () => {
+    const resultItems = document.querySelectorAll('.search-result-item[data-product-id]');
+    resultItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
         const productId = parseInt(item.dataset.productId);
-        scrollToProduct(productId);
+        console.log(`🔍 Хайлтын үр дүнгээс бүтээгдэхүүн ${productId} сонгосон`);
+        
+        // Үр дүн хаах
         searchResults.classList.add('hidden');
         searchInput.value = '';
+        
+        // Бүтээгдэхүүн хүртэл плавно скролл хийх
+        setTimeout(() => {
+          scrollToProduct(productId);
+        }, 100);
       });
     });
     
