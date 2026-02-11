@@ -51,15 +51,12 @@ const products = [
   { id: 8, name: 'Тусгаарласан Хэрэгслийн Цогц', description: '18 ширхэг тусгаарлагчтай хэрэгсэл', price: 9500, images: ['https://via.placeholder.com/260x180?text=Цогц+1', 'https://via.placeholder.com/260x180?text=Цогц+2', 'https://via.placeholder.com/260x180?text=Цогц+3', 'https://via.placeholder.com/260x180?text=Цогц+4', 'https://via.placeholder.com/260x180?text=Цогц+5'] },
   { id: 9, name: 'Хүчдэл хэмжигч', description: 'Гэмтсэн хэсгийг хэмжиж олно', price: 85000, images: ['https://via.placeholder.com/260x180?text=Хэмжигч+1', 'https://via.placeholder.com/260x180?text=Хэмжигч+2', 'https://via.placeholder.com/260x180?text=Хэмжигч+3', 'https://via.placeholder.com/260x180?text=Хэмжигч+4', 'https://via.placeholder.com/260x180?text=Хэмжигч+5'] },
   { id: 10, name: 'Утасны Сүлжээний Тестэр', description: 'Утасны сүлжээний холболт шалгах хэрэгсэл', price: 22000, images: ['https://via.placeholder.com/260x180?text=Тестэр+1', 'https://via.placeholder.com/260x180?text=Тестэр+2', 'https://via.placeholder.com/260x180?text=Тестэр+3', 'https://via.placeholder.com/260x180?text=Тестэр+4', 'https://via.placeholder.com/260x180?text=Тестэр+5'] }
-  // ШИНЭ БҮТЭЭГДЭХҮҮН НЭМЭХ: Дээрх мөрнээс таслал(',') нэмж доор нэг мөр нэмнэ
-  // { id: 11, name: 'Бүтээгдэхүүний нэр', description: 'Товч тайлбар', price: 25000, images: ['https://via.placeholder.com/260x180?text=Зургаа+1', 'https://via.placeholder.com/260x180?text=Зургаа+2', 'https://via.placeholder.com/260x180?text=Зургаа+3', 'https://via.placeholder.com/260x180?text=Зургаа+4', 'https://via.placeholder.com/260x180?text=Зургаа+5'] }
 ];
 
 // ========== I18N: Нэгдсэн орчуулга ==========
 const translations = {
   mn: {
     products_title: 'Бүтээгдэхүүн',
-    products_subtitle: 'Мэргэжлийн цахилгаан тоног төхөөрөмж',
     cart_title: 'Таны сагс',
     cart_empty: 'Таны сагс хоосон байна',
     continue_shopping: 'Үргэлжлүүлэн худалдан авах',
