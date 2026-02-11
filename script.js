@@ -747,11 +747,22 @@ if (paymentFormEl) {
   });
 }
 
-// Complete payment button эвент
+// Complete payment button эвент - duplicate click защита
+let isProcessingPayment = false;
 const completePaymentBtn = document.getElementById("completePayment");
 if (completePaymentBtn) {
   completePaymentBtn.addEventListener("click", function () {
+    // Давхар click-с сайн
+    if (isProcessingPayment) {
+      console.warn("⚠️ Payment already processing");
+      return;
+    }
+    isProcessingPayment = true;
     completePayment();
+    // Payment боловсруулалт дуусч tracking code авсны дараа flag сэргээх
+    setTimeout(() => {
+      isProcessingPayment = false;
+    }, 3000);
   });
 }
 
