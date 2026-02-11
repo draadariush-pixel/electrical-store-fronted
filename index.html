@@ -107,6 +107,27 @@
         <div id="trackingLoading" style="display: none; text-align: center; padding: 20px; color: #666;">
           ⏳ Хүлээнэ үү...
         </div>
+
+        <div id="trackingResult" style="display: none; margin-top: 20px; background: #333; padding: 20px; border-radius: 8px; color: #fff;">
+          <div id="trackingInfo" style="padding: 15px; background: #444; border-radius: 8px; margin-bottom: 15px;">
+            <p style="margin: 0 0 8px 0; color: #ccc;"><strong>Нэр:</strong> <span id="trackingName" style="color: #fff;"></span></p>
+            <p style="margin: 0 0 8px 0; color: #ccc;"><strong>Хаяг:</strong> <span id="trackingAddress" style="color: #fff;"></span></p>
+            <p style="margin: 0; color: #ccc;"><strong>Статус:</strong> <span id="trackingStatus" style="color: #ff6b6b; font-weight: 600;"></span></p>
+          </div>
+
+          <div id="trackingProducts" style="padding: 15px; background: #444; border-radius: 8px; border: 1px solid #555;">
+            <h3 style="margin-top: 0; margin-bottom: 10px; font-size: 16px; color: #ff6b6b;">📦 Бүтээгдэхүүн:</h3>
+            <div id="productsList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            <div id="productsEmpty" style="text-align: center; padding: 20px; color: #888;">
+              Бүтээгдэхүүн байхгүй
+            </div>
+          </div>
+
+          <div id="trackingTimeline" style="margin-top: 20px;">
+            <h3 style="margin-top: 0; margin-bottom: 15px; font-size: 16px; color: #ff6b6b;">⏱️ Хяналтын түүх:</h3>
+            <div id="timeline" style="display: flex; flex-direction: column; gap: 15px;"></div>
+          </div>
+        </div>
       </div>
     </aside>
   </main>

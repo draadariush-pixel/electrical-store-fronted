@@ -634,7 +634,8 @@ ${productList}
 ⚠️ Та байгууллагын дансанд төлбөр төлөгдсөн эсэхийг шалгана уу!
 `;
 
-  sendTelegramMessage(message, orderId, (trackingCode) => {
+  console.log('🛒 Sending cart to backend:', appState.cart);
+  sendTelegramMessage(message, orderId, appState.cart, (trackingCode) => {
     // Callback - tracking code авсны дараа
     appState.trackingCode = trackingCode; // Tracking code хадгалах
     appState.orderIdInProgress = null; // Flag сэргээх
@@ -684,7 +685,7 @@ ${productList}
 
 let lastSentOrderId = null; // Duplicate prevention
 
-function sendTelegramMessage(message, orderId, callback) {
+function sendTelegramMessage(message, orderId, cartItems, callback) {
   // Duplicate check - нэг orderId л нэг удаа явуулна
   if (lastSentOrderId === orderId) {
     console.warn("⚠️ Duplicate order ID - skipping");
@@ -700,12 +701,21 @@ function sendTelegramMessage(message, orderId, callback) {
   const address = appState.customerInfo?.address || '';
   const customerTelegramId = (document.getElementById('customerTelegramId') || {}).value || '';
   
+  console.log('📤 Sending to backend:', {
+    orderId: orderId,
+    phone: phone,
+    name: name,
+    address: address,
+    cartItems: cartItems,
+    cartItemsCount: cartItems ? cartItems.length : 0
+  });
+  
   fetch("https://electrical-store-backend.onrender.com/send-telegram", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"  
     },
-    body: JSON.stringify({ message: message, orderId: orderId, phone: phone, name: name, address: address, customerTelegramId: customerTelegramId })  
+    body: JSON.stringify({ message: message, orderId: orderId, phone: phone, name: name, address: address, customerTelegramId: customerTelegramId, cartItems: cartItems })  
   })
   .then(res => res.json())
   .then(data => {
@@ -832,20 +842,27 @@ async function fetchTrackingData(trackingCode) {
     const response = await fetch(`https://electrical-store-backend.onrender.com/track/${encodeURIComponent(trackingCode)}`);
     const data = await response.json();
 
+    console.log('🔍 Tracking Response:', data);
+
     document.getElementById('trackingLoading').style.display = 'none';
 
     if (data.success) {
       const order = data.order;
 
+      console.log('✅ Order retrieved:', order);
+
       updateTrackingTimeline(order.status);
+      displayTrackingInfo(order);
 
       document.getElementById('trackingError').style.display = 'none';
+      document.getElementById('trackingResult').style.display = 'block';
 
       // Хүргэгдсэн эсвэл цуцлагдсан болсон үед polling зогс
       if (order.status === 'done' || order.status === 'cancel') {
         clearInterval(trackingPollingInterval);
       }
     } else {
+      console.log('❌ Tracking failed:', data);
       document.getElementById('trackingErrorText').textContent = 'Захиалга олдсонгүй. Кодыг зөв оруулсан эсэхийг шалгана уу.';
       document.getElementById('trackingError').style.display = 'block';
       clearInterval(trackingPollingInterval);
@@ -863,23 +880,72 @@ function updateTrackingTimeline(status) {
 
   const timelineHtml = `
     <div style="display: flex; align-items: center; margin: 8px 0;">
-      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 0 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-      <span>⏳ Захиалга бэлдэж байна</span>
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 0 ? '#4caf50' : '#666'}; margin-right: 8px;"></span>
+      <span style="color: #ccc;">⏳ Захиалга бэлдэж байна</span>
     </div>
     <div style="display: flex; align-items: center; margin: 8px 0;">
-      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 1 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-      <span>📦 Хүргэлт гарсан</span>
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 1 ? '#4caf50' : '#666'}; margin-right: 8px;"></span>
+      <span style="color: #ccc;">📦 Хүргэлт гарсан</span>
     </div>
     <div style="display: flex; align-items: center; margin: 8px 0;">
-      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 2 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-      <span>🚚 Замдаа явж байна</span>
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 2 ? '#4caf50' : '#666'}; margin-right: 8px;"></span>
+      <span style="color: #ccc;">🚚 Замдаа явж байна</span>
     </div>
     <div style="display: flex; align-items: center; margin: 8px 0;">
-      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 3 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-      <span>✅ Хүргэгдсэн</span>
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 3 ? '#4caf50' : '#666'}; margin-right: 8px;"></span>
+      <span style="color: #ccc;">✅ Хүргэгдсэн</span>
     </div>
   `;
   
-  document.getElementById('trackingTimeline').innerHTML = timelineHtml;
+  document.getElementById('timeline').innerHTML = timelineHtml;
+}
+
+function displayTrackingInfo(order) {
+  console.log('📦 Display Tracking Info:', order);
+  console.log('📦 Cart Items:', order.cartItems);
+  
+  // Хүргэлтийн мэдээлэл
+  document.getElementById('trackingName').textContent = order.name || 'Мэдээлэл байхгүй';
+  document.getElementById('trackingAddress').textContent = order.address || 'Мэдээлэл байхгүй';
+  
+  // Статус
+  const statusMap = {
+    'pending': '⏳ Бэлдэж байна',
+    'shi': '📦 Хүргэлт гарсан',
+    'ready': '🚚 Замдаа явж байна',
+    'done': '✅ Хүргэгдсэн',
+    'cancel': '❌ Цуцлагдсан'
+  };
+  document.getElementById('trackingStatus').textContent = statusMap[order.status] || 'Статус мэдээлэл байхгүй';
+  
+  // Бүтээгдэхүүн
+  const productsList = document.getElementById('productsList');
+  const productsEmpty = document.getElementById('productsEmpty');
+  
+  console.log('🛒 Checking cartItems:', {
+    exists: !!order.cartItems,
+    isArray: Array.isArray(order.cartItems),
+    length: order.cartItems ? order.cartItems.length : 0
+  });
+  
+  if (order.cartItems && Array.isArray(order.cartItems) && order.cartItems.length > 0) {
+    console.log('✅ Rendering products');
+    productsList.innerHTML = order.cartItems.map(item => `
+      <div style="padding: 10px; background: #555; border-radius: 6px; border: 1px solid #666; display: flex; justify-content: space-between; align-items: center;">
+        <div style="flex: 1;">
+          <p style="margin: 0 0 5px 0; font-weight: 600; font-size: 14px; color: #fff;">${item.name}</p>
+          <p style="margin: 0; color: #bbb; font-size: 12px;">x${item.quantity}</p>
+        </div>
+        <div style="text-align: right;">
+          <p style="margin: 0; font-weight: 600; font-size: 14px; color: #ff6b6b;">₩${(item.price * item.quantity).toLocaleString('mn-MN')}</p>
+        </div>
+      </div>
+    `).join('');
+    productsEmpty.style.display = 'none';
+  } else {
+    console.log('❌ No products found');
+    productsEmpty.style.display = 'block';
+    productsList.innerHTML = '';
+  }
 }
 
