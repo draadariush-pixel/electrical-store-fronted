@@ -968,23 +968,63 @@ backToTopBtn.addEventListener('click', () => {
 
 console.log('✅ Мобиль функцыг нэмсэн: Back to Top кнопка идэвхтэй байна');
 
+// ========== Fuzzy Match Function ==========
+function fuzzyMatch(query, text) {
+  const queryChars = query.toLowerCase().split('');
+  const textChars = text.toLowerCase().split('');
+  let queryIndex = 0;
+  let score = 0;
+  let lastMatchIndex = -1;
+  
+  for (let i = 0; i < textChars.length && queryIndex < queryChars.length; i++) {
+    if (textChars[i] === queryChars[queryIndex]) {
+      // Дараалсан илэрцийн үед оноог нэмэх
+      if (i === lastMatchIndex + 1) {
+        score += 10; // дараалсан ч хэлбэл илүүтэй оноо
+      } else {
+        score += 1;
+      }
+      lastMatchIndex = i;
+      queryIndex++;
+    }
+  }
+  
+  // Хайлт бүтэн матчээ байхэд буцаах оноо
+  if (queryIndex === queryChars.length) {
+    // Эхэндээ байрлалын хувьд оноо нэмэх
+    if (text.toLowerCase().startsWith(query)) {
+      score += 50;
+    }
+    return score;
+  }
+  return -1;
+}
+
 // ========== Product Search Functionality ==========
 const searchInput = document.getElementById('searchInput');
 const searchResults = document.getElementById('searchResults');
 
 searchInput.addEventListener('input', (e) => {
-  const query = e.target.value.trim().toLowerCase();
+  const query = e.target.value.trim();
   
   if (query.length === 0) {
     searchResults.classList.add('hidden');
     return;
   }
   
-  // Хайлтыг гүйцэтгэх
-  const filtered = products.filter(product => 
-    product.name.toLowerCase().includes(query) ||
-    product.description.toLowerCase().includes(query)
-  );
+  // Fuzzy match ашиглан хайлтыг гүйцэтгэх
+  const filtered = products.map(product => {
+    const nameScore = fuzzyMatch(query, product.name);
+    const descScore = fuzzyMatch(query, product.description);
+    const score = Math.max(nameScore, descScore);
+    
+    return {
+      product: product,
+      score: score
+    };
+  })
+  .filter(item => item.score >= 0) // матч байгаа зүйлсийг авах
+  .sort((a, b) => b.score - a.score); // оноогоор эрэмбэлэх
   
   if (filtered.length === 0) {
     searchResults.innerHTML = '<div class="search-result-item" style="text-align: center; color: var(--muted);">Бүтээгдэхүүн олдсонгүй</div>';
@@ -992,11 +1032,11 @@ searchInput.addEventListener('input', (e) => {
     return;
   }
   
-  // Хайлтын үр дүнг харуулах
-  searchResults.innerHTML = filtered.map(product => `
-    <div class="search-result-item" onclick="scrollToProduct(${product.id}); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('searchInput').value = '';">
-      <div class="search-result-name">${product.name}</div>
-      <div class="search-result-price">₩${product.price.toLocaleString('mn-MN')}</div>
+  // Хайлтын үр дүнг харуулах (эрэмбэлсэн)
+  searchResults.innerHTML = filtered.map(item => `
+    <div class="search-result-item" onclick="scrollToProduct(${item.product.id}); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('searchInput').value = '';">
+      <div class="search-result-name">${item.product.name}</div>
+      <div class="search-result-price">₩${item.product.price.toLocaleString('mn-MN')}</div>
     </div>
   `).join('');
   
@@ -1030,5 +1070,5 @@ document.addEventListener('click', (e) => {
   }
 });
 
-console.log('✅ Хайлт функцыг нэмсэн: Бүтээгдэхүүнээр хайх бололцоотой');
+console.log('✅ Fuzzy search функцыг нэмсэн: Үсэгний дараадалаар хайх бололцоотой');
 
