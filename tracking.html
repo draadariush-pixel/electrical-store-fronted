@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Захиалгын хяналт - JUGGERNAUT ELECTRIC LLC</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .tracking-container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .tracking-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .tracking-header h1 {
+      font-size: 24px;
+      margin: 0 0 10px 0;
+      color: #333;
+    }
+
+    .tracking-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    .form-group input {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .btn-track {
+      background: #ff6b35;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .btn-track:hover {
+      background: #e55a24;
+    }
+
+    .tracking-result {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .tracking-result.show {
+      display: block;
+    }
+
+    .tracking-result.success {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+    }
+
+    .tracking-result.error {
+      background: #ffebee;
+      border-left: 4px solid #f44336;
+    }
+
+    .order-info {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    .order-info-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      font-size: 14px;
+    }
+
+    .order-info-label {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .order-info-value {
+      color: #666;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 8px 12px;
+      border-radius: 20px;
+      background: #2196f3;
+      color: white;
+      font-weight: 600;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .status-timeline {
+      margin-top: 20px;
+      padding: 15px;
+    }
+
+    .timeline-item {
+      display: flex;
+      margin: 15px 0;
+      align-items: flex-start;
+    }
+
+    .timeline-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #ccc;
+      margin-right: 15px;
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .timeline-dot.active {
+      background: #4caf50;
+    }
+
+    .timeline-text {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .timeline-text.active {
+      color: #4caf50;
+      font-weight: 600;
+    }
+
+    .loading {
+      text-align: center;
+      color: #666;
+      display: none;
+    }
+
+    .loading.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-container">
+      <div class="logo">
+        <h1>⚡ JUGGERNAUT ELECTRIC LLC</h1>
+        <p class="tagline">Цахилгаанчидад зориулсан мэргэжлийн тоног хэрэгсэл</p>
+      </div>
+      <a href="index.html" class="btn btn-primary" style="text-decoration: none; display: inline-block; padding: 10px 20px;">← Буцах</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="tracking-container">
+      <div class="tracking-header">
+        <h1>📦 Захиалгын хяналт</h1>
+        <p>Таны захиалгын явцыг шалгана уу</p>
+      </div>
+
+      <form class="tracking-form" id="trackingForm">
+        <div class="form-group">
+          <label for="phoneInput">Утасны дугаар:</label>
+          <input 
+            type="tel" 
+            id="phoneInput" 
+            placeholder="+976 XX XXX XXX" 
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="orderIdInput">Захиалгын ID:</label>
+          <input 
+            type="text" 
+            id="orderIdInput" 
+            placeholder="Сүүлийн 6 оронтой" 
+            required
+          />
+        </div>
+        <button type="submit" class="btn-track">Хайх</button>
+      </form>
+
+      <div class="loading" id="loading">
+        ⏳ Хүлээнэ үү...
+      </div>
+
+      <div class="tracking-result" id="trackingResult">
+        <h2 id="resultTitle"></h2>
+        
+        <div class="order-info">
+          <div class="order-info-item">
+            <span class="order-info-label">Захиалгын дугаар:</span>
+            <span class="order-info-value" id="orderIdDisplay"></span>
+          </div>
+          <div class="order-info-item">
+            <span class="order-info-label">Захиалагчийн нэр:</span>
+            <span class="order-info-value" id="customerName"></span>
+          </div>
+          <div class="order-info-item">
+            <span class="order-info-label">Хүргэлтийн хаяг:</span>
+            <span class="order-info-value" id="address"></span>
+          </div>
+          <div class="order-info-item">
+            <span class="order-info-label">Захиалсан хугацаа:</span>
+            <span class="order-info-value" id="createdDate"></span>
+          </div>
+        </div>
+
+        <div class="status-badge" id="statusBadge"></div>
+
+        <div class="status-timeline">
+          <h3>Явцын мэдээлэл:</h3>
+          <div class="timeline-item">
+            <div class="timeline-dot" id="dot1"></div>
+            <div class="timeline-text" id="text1">⏳ Сахилж буй</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" id="dot2"></div>
+            <div class="timeline-text" id="text2">📦 Хүргэлт гарсан</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" id="dot3"></div>
+            <div class="timeline-text" id="text3">🚚 Замдаа явж байна</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" id="dot4"></div>
+            <div class="timeline-text" id="text4">✅ Хүргэгдсэн</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-container">
+      <p>&copy; 2026 JUGGERNAUT ELECTRIC LLC</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('trackingForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const phone = document.getElementById('phoneInput').value.trim();
+      const orderId = document.getElementById('orderIdInput').value.trim();
+      
+      if (!phone || !orderId) {
+        alert('Бүх талбарыг бөглөнө үү!');
+        return;
+      }
+
+      document.getElementById('loading').classList.add('show');
+      document.getElementById('trackingResult').classList.remove('show', 'success', 'error');
+
+      try {
+        const response = await fetch(`https://electrical-store-backend.onrender.com/track/${encodeURIComponent(phone)}/${encodeURIComponent(orderId)}`);
+        const data = await response.json();
+
+        document.getElementById('loading').classList.remove('show');
+
+        if (data.success) {
+          const order = data.order;
+          
+          document.getElementById('resultTitle').textContent = '✅ Захиалга олдсон';
+          document.getElementById('orderIdDisplay').textContent = order.orderId;
+          document.getElementById('customerName').textContent = order.name;
+          document.getElementById('address').textContent = order.address;
+          document.getElementById('createdDate').textContent = new Date(order.createdAt).toLocaleString('mn-MN');
+          document.getElementById('statusBadge').textContent = order.statusText;
+
+          // Update timeline based on status
+          updateTimeline(order.status);
+
+          document.getElementById('trackingResult').classList.add('show', 'success');
+        } else {
+          document.getElementById('resultTitle').textContent = '❌ Захиалга олдсонгүй';
+          document.getElementById('trackingResult').innerHTML += '<p>Утасны дугаар болон захиалгын ID-г зөв оруулсан эсэхийг шалгана уу.</p>';
+          document.getElementById('trackingResult').classList.add('show', 'error');
+        }
+      } catch (err) {
+        document.getElementById('loading').classList.remove('show');
+        document.getElementById('resultTitle').textContent = '❌ Алдаа гарлаа';
+        document.getElementById('trackingResult').innerHTML += '<p>Сервертэй холбо тогтоолд асуудал гарлаа. Дараа нь дахин оролдоно уу.</p>';
+        document.getElementById('trackingResult').classList.add('show', 'error');
+        console.error('Tracking error:', err);
+      }
+    });
+
+    function updateTimeline(status) {
+      const statuses = ['pending', 'shi', 'ready', 'done'];
+      const statusIndex = statuses.indexOf(status);
+
+      for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot${i + 1}`);
+        const text = document.getElementById(`text${i + 1}`);
+        
+        if (i <= statusIndex || status === 'done') {
+          dot.classList.add('active');
+          text.classList.add('active');
+        } else {
+          dot.classList.remove('active');
+          text.classList.remove('active');
+        }
+      }
+    }
+  </script>
+</body>
+</html>

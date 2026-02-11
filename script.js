@@ -585,17 +585,28 @@ ${productList}
 }
 function sendTelegramMessage(message) {
     const orderId = Date.now(); // Захиалгын unique ID  
+  const phone = (document.getElementById('phoneInput') || {}).value || '';
+  const name = appState.customerInfo?.name || '';
+  const address = appState.customerInfo?.address || '';
+  
   fetch("https://electrical-store-backend.onrender.com/send-telegram", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"  
     },
-    body: JSON.stringify({ message: message, orderId: orderId  })  
+    body: JSON.stringify({ message: message, orderId: orderId, phone: phone, name: name, address: address })  
   })
   .then(res => res.json())
   .then(data => {
     console.log("Telegram OK:", data);
-    alert("Захиалга амжилттай илгээгдлээ ✅");
+    // Tracking link үүсгэх (Telegram response дээрээс shortOrderId авна)
+    const shortOrderId = String(orderId).slice(-6);
+    const trackingUrl = `${window.location.origin}/tracking.html?phone=${encodeURIComponent(phone)}&orderId=${shortOrderId}`;
+    
+    // SMS үүсгэх заохис (төлөвлөгөө)
+    console.log("📍 Tracking link:", trackingUrl);
+    
+    alert("Захиалга амжилттай илгээгдлээ ✅\n\nХүргэлтийн явцыг tracking.html хуудаснаас шалгаж болно.");
   })
   .catch(err => {
     console.error("Telegram ERROR:", err);
