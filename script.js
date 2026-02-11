@@ -599,14 +599,17 @@ function sendTelegramMessage(message) {
   .then(res => res.json())
   .then(data => {
     console.log("Telegram OK:", data);
-    // Tracking link үүсгэх (Telegram response дээрээс shortOrderId авна)
-    const shortOrderId = String(orderId).slice(-6);
-    const trackingUrl = `${window.location.origin}/tracking.html?phone=${encodeURIComponent(phone)}&orderId=${shortOrderId}`;
-    
-    // SMS үүсгэх заохис (төлөвлөгөө)
-    console.log("📍 Tracking link:", trackingUrl);
-    
-    alert("Захиалга амжилттай илгээгдлээ ✅\n\nХүргэлтийн явцыг tracking.html хуудаснаас шалгаж болно.");
+    // Tracking link үүсгэх
+    if (data.trackingCode) {
+      const trackingUrl = `${window.location.origin}/tracking.html?code=${data.trackingCode}`;
+      console.log("📍 Tracking Link:", trackingUrl);
+      console.log("📱 Tracking Code:", data.trackingCode);
+      
+      // Alert-д tracking code харуулах
+      alert(`Захиалга амжилттай илгээгдлээ ✅\n\nТаны захиалгын код: ${data.trackingCode}\n\nХүргэлтийн явцыг шалгах:\n${trackingUrl}`);
+    } else {
+      alert("Захиалга амжилттай илгээгдлээ ✅");
+    }
   })
   .catch(err => {
     console.error("Telegram ERROR:", err);

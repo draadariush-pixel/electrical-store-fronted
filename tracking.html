@@ -186,22 +186,13 @@
         <p>Таны захиалгын явцыг шалгана уу</p>
       </div>
 
-      <form class="tracking-form" id="trackingForm">
+      <form class="tracking-form" id="trackingForm" style="display:none;">
         <div class="form-group">
-          <label for="phoneInput">Утасны дугаар:</label>
-          <input 
-            type="tel" 
-            id="phoneInput" 
-            placeholder="+976 XX XXX XXX" 
-            required
-          />
-        </div>
-        <div class="form-group">
-          <label for="orderIdInput">Захиалгын ID:</label>
+          <label for="trackingCodeInput">Захиалгын код:</label>
           <input 
             type="text" 
-            id="orderIdInput" 
-            placeholder="Сүүлийн 6 оронтой" 
+            id="trackingCodeInput" 
+            placeholder="ABC123" 
             required
           />
         </div>
@@ -217,8 +208,8 @@
         
         <div class="order-info">
           <div class="order-info-item">
-            <span class="order-info-label">Захиалгын дугаар:</span>
-            <span class="order-info-value" id="orderIdDisplay"></span>
+            <span class="order-info-label">Захиалгын код:</span>
+            <span class="order-info-value" id="trackingCodeDisplay" style="font-weight: bold; color: #ff6b35; font-size: 18px;"></span>
           </div>
           <div class="order-info-item">
             <span class="order-info-label">Захиалагчийн нэр:</span>
@@ -266,22 +257,50 @@
   </footer>
 
   <script>
+    // URL параметрээс код авах
+    const urlParams = new URLSearchParams(window.location.search);
+    const trackingCodeFromUrl = urlParams.get('code');
+
+    let pollingInterval = null;
+    let currentTrackingCode = null;
+
+    // Tracking code авсан эсэхийг шалгаж, шууд load хийнэ
+    if (trackingCodeFromUrl) {
+      document.getElementById('trackingCodeInput').value = trackingCodeFromUrl;
+      loadTracking(trackingCodeFromUrl);
+    } else {
+      document.getElementById('trackingForm').style.display = 'flex';
+    }
+
     document.getElementById('trackingForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const phone = document.getElementById('phoneInput').value.trim();
-      const orderId = document.getElementById('orderIdInput').value.trim();
+      const trackingCode = document.getElementById('trackingCodeInput').value.trim().toUpperCase();
       
-      if (!phone || !orderId) {
-        alert('Бүх талбарыг бөглөнө үү!');
+      if (!trackingCode) {
+        alert('Захиалгын кодыг оруулна уу!');
         return;
       }
 
+      loadTracking(trackingCode);
+    });
+
+    function loadTracking(trackingCode) {
+      currentTrackingCode = trackingCode;
+      document.getElementById('trackingForm').style.display = 'none';
       document.getElementById('loading').classList.add('show');
       document.getElementById('trackingResult').classList.remove('show', 'success', 'error');
 
+      fetchTrackingData(trackingCode);
+
+      // Polling: 3 секунд тутам status шалгах
+      if (pollingInterval) clearInterval(pollingInterval);
+      pollingInterval = setInterval(() => fetchTrackingData(trackingCode), 3000);
+    }
+
+    async function fetchTrackingData(trackingCode) {
       try {
-        const response = await fetch(`https://electrical-store-backend.onrender.com/track/${encodeURIComponent(phone)}/${encodeURIComponent(orderId)}`);
+        const response = await fetch(`https://electrical-store-backend.onrender.com/track/${encodeURIComponent(trackingCode)}`);
         const data = await response.json();
 
         document.getElementById('loading').classList.remove('show');
@@ -290,7 +309,7 @@
           const order = data.order;
           
           document.getElementById('resultTitle').textContent = '✅ Захиалга олдсон';
-          document.getElementById('orderIdDisplay').textContent = order.orderId;
+          document.getElementById('trackingCodeDisplay').textContent = order.trackingCode;
           document.getElementById('customerName').textContent = order.name;
           document.getElementById('address').textContent = order.address;
           document.getElementById('createdDate').textContent = new Date(order.createdAt).toLocaleString('mn-MN');
@@ -300,19 +319,24 @@
           updateTimeline(order.status);
 
           document.getElementById('trackingResult').classList.add('show', 'success');
+
+          // Хүргэгдсэн болсон үед polling зогс
+          if (order.status === 'done' || order.status === 'cancel') {
+            clearInterval(pollingInterval);
+          }
         } else {
           document.getElementById('resultTitle').textContent = '❌ Захиалга олдсонгүй';
-          document.getElementById('trackingResult').innerHTML += '<p>Утасны дугаар болон захиалгын ID-г зөв оруулсан эсэхийг шалгана уу.</p>';
+          document.getElementById('trackingResult').innerHTML = '<h2>❌ Захиалга олдсонгүй</h2><p>Захиалгын кодыг зөв оруулсан эсэхийг шалгана уу.</p>';
           document.getElementById('trackingResult').classList.add('show', 'error');
+          clearInterval(pollingInterval);
+          document.getElementById('trackingForm').style.display = 'flex';
         }
       } catch (err) {
         document.getElementById('loading').classList.remove('show');
-        document.getElementById('resultTitle').textContent = '❌ Алдаа гарлаа';
-        document.getElementById('trackingResult').innerHTML += '<p>Сервертэй холбо тогтоолд асуудал гарлаа. Дараа нь дахин оролдоно уу.</p>';
-        document.getElementById('trackingResult').classList.add('show', 'error');
         console.error('Tracking error:', err);
+        // Retry on error
       }
-    });
+    }
 
     function updateTimeline(status) {
       const statuses = ['pending', 'shi', 'ready', 'done'];
@@ -331,6 +355,11 @@
         }
       }
     }
+
+    // Clean up on page leave
+    window.addEventListener('beforeunload', () => {
+      if (pollingInterval) clearInterval(pollingInterval);
+    });
   </script>
 </body>
 </html>
