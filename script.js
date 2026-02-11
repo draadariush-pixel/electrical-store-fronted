@@ -601,15 +601,14 @@ function completePayment() {
 ).join("\n");
 
   const message = `
-⚠️ Та байгууллагын дансанд төлбөр төлөгдсөн эсэхийг шалган баталгаажуулна уу!
+⏳ ШИНЭ ЗАХИАЛГА
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-👤 Захиалагч: ${appState.customerInfo?.name || "Нэр оруулаагүй"}
+📦 Захиалгын код: <b>${appState.trackingCode || '...'}</b>
 
-
-
+👤 Нэр: <b>${appState.customerInfo?.name || "Нэр оруулаагүй"}</b>
 📞 Утас: ${phone}
-
-📍 Хүргэлтийн хаяг: ${address}
+📍 Хаяг: ${address}
 
 📝 Нэмэлт мэдээлэл:
 ${notes || "Байхгүй"}
@@ -617,14 +616,18 @@ ${notes || "Байхгүй"}
 📦 Захиалсан бүтээгдэхүүн:
 ${productList}
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📊 Нийт ширхэг: ${appState.cart.reduce((s,i)=>s+i.quantity,0)}
 💰 Барааны үнэ: ₮${formatPrice(subtotal)}
 🚚 Хүргэлт: ₮${formatPrice(delivery)}
 ✅ Төлөх дүн: ₮${formatPrice(total)}
+
+⚠️ Та байгууллагын дансанд төлбөр төлөгдсөн эсэхийг шалгана уу!
 `;
 
   sendTelegramMessage(message, (trackingCode) => {
     // Callback - tracking code авсны дараа
+    appState.trackingCode = trackingCode; // Tracking code хадгалах
     
     // Сагсыг цэвэрлэх
     appState.cart = [];
@@ -684,10 +687,8 @@ function sendTelegramMessage(message, callback) {
   .then(res => res.json())
   .then(data => {
     console.log("Telegram OK:", data);
-    // Tracking link үүсгэх
+    // Tracking code авах
     if (data.trackingCode) {
-      const trackingUrl = `${window.location.origin}/tracking.html?code=${data.trackingCode}`;
-      console.log("📍 Tracking Link:", trackingUrl);
       console.log("📱 Tracking Code:", data.trackingCode);
       
       // Callback дуудаж tracking code дамжуулах
