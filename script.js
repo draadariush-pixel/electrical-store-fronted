@@ -1,6 +1,41 @@
 
 console.log("script.js ачааллаа ✅");
 
+// URL parameter дээр tracking code авч шалгах
+function checkTrackingCodeFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const trackingCode = params.get('track');
+  
+  if (trackingCode) {
+    // Tracking modal асааж tracking code оруулж автоматаар search хийлгэх
+    setTimeout(() => {
+      showTrackingByCode(trackingCode);
+    }, 500);
+  }
+}
+
+function showTrackingByCode(trackingCode) {
+  const trackingSection = document.getElementById('trackingSection');
+  const trackingCodeInput = document.getElementById('trackingCodeInput');
+  
+  // Tracking modal нээ
+  if (trackingSection.classList.contains('hidden')) {
+    trackingSection.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+  
+  // Tracking code оруулаж search хийлгэ
+  trackingCodeInput.value = trackingCode.toUpperCase();
+  
+  // 500ms дараа search хийлгэ (DOM готов байхын тулд)
+  setTimeout(() => {
+    handleTrackingSearch();
+  }, 300);
+  
+  // URL-аас parameter хасаж clean URL гаргах
+  window.history.replaceState({}, document.title, window.location.pathname);
+}
+
 function formatPrice(num){
   return Number(num).toLocaleString('en-US').replace(/,/g, "'");
 }
@@ -110,6 +145,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupListeners(){
+  // URL дээр tracking code байгаа эсэх шалгах
+  checkTrackingCodeFromURL();
+  
   elements.cartBtn.addEventListener('click', toggleCart);
   elements.closeCartBtn.addEventListener('click', toggleCart);
   elements.checkoutBtn.addEventListener('click', handleCheckout);
