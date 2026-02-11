@@ -676,13 +676,14 @@ function sendTelegramMessage(message, callback) {
   const phone = (document.getElementById('phoneInput') || {}).value || '';
   const name = appState.customerInfo?.name || '';
   const address = appState.customerInfo?.address || '';
+  const customerTelegramId = (document.getElementById('customerTelegramId') || {}).value || '';
   
   fetch("https://electrical-store-backend.onrender.com/send-telegram", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"  
     },
-    body: JSON.stringify({ message: message, orderId: orderId, phone: phone, name: name, address: address })  
+    body: JSON.stringify({ message: message, orderId: orderId, phone: phone, name: name, address: address, customerTelegramId: customerTelegramId })  
   })
   .then(res => res.json())
   .then(data => {
@@ -768,14 +769,20 @@ function toggleTracking(){
 }
 
 let trackingPollingInterval = null;
+let currentTrackingCode = null;
 
 function handleTrackingSearch(){
   const trackingCode = document.getElementById('trackingCodeInput').value.trim().toUpperCase();
+  const customerTelegramId = document.getElementById('customerTelegramId').value.trim();
   
   if (!trackingCode) {
     alert('Захиалгын кодыг оруулна уу!');
     return;
   }
+
+  // Tracking code + customer ID хадгалах
+  currentTrackingCode = trackingCode;
+  appState.customerTelegramId = customerTelegramId;
 
   document.getElementById('trackingForm').style.display = 'none';
   document.getElementById('trackingResult').style.display = 'none';
