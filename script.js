@@ -201,7 +201,7 @@ function renderProducts(){
     ).join('');
     
     return `
-      <div class="product-card">
+      <div class="product-card" data-product-id="${p.id}">
         <div class="product-carousel" data-id="${p.id}">
           <div class="carousel-container">
             ${imagesHTML}
@@ -967,4 +967,68 @@ backToTopBtn.addEventListener('click', () => {
 });
 
 console.log('✅ Мобиль функцыг нэмсэн: Back to Top кнопка идэвхтэй байна');
+
+// ========== Product Search Functionality ==========
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.trim().toLowerCase();
+  
+  if (query.length === 0) {
+    searchResults.classList.add('hidden');
+    return;
+  }
+  
+  // Хайлтыг гүйцэтгэх
+  const filtered = products.filter(product => 
+    product.name.toLowerCase().includes(query) ||
+    product.description.toLowerCase().includes(query)
+  );
+  
+  if (filtered.length === 0) {
+    searchResults.innerHTML = '<div class="search-result-item" style="text-align: center; color: var(--muted);">Бүтээгдэхүүн олдсонгүй</div>';
+    searchResults.classList.remove('hidden');
+    return;
+  }
+  
+  // Хайлтын үр дүнг харуулах
+  searchResults.innerHTML = filtered.map(product => `
+    <div class="search-result-item" onclick="scrollToProduct(${product.id}); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('searchInput').value = '';">
+      <div class="search-result-name">${product.name}</div>
+      <div class="search-result-price">₩${product.price.toLocaleString('mn-MN')}</div>
+    </div>
+  `).join('');
+  
+  searchResults.classList.remove('hidden');
+});
+
+// Бүтээгдэхүүн хүртэл скроллох функц
+function scrollToProduct(productId) {
+  const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+  if (productCard) {
+    productCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Гэрэлтүүлэх эффект
+    productCard.style.animation = 'highlight 1s ease';
+  }
+}
+
+// Highlight анимейшн нэмэх
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes highlight {
+    0% { background-color: rgba(255, 180, 0, 0.3); }
+    100% { background-color: transparent; }
+  }
+`;
+document.head.appendChild(style);
+
+// Хайлт нээлттэй байхад гадны зүйл дээр клик хийхэд хаах
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.header-search') && !searchResults.classList.contains('hidden')) {
+    searchResults.classList.add('hidden');
+  }
+});
+
+console.log('✅ Хайлт функцыг нэмсэн: Бүтээгдэхүүнээр хайх бололцоотой');
 

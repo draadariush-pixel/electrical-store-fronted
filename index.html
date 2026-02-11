@@ -18,21 +18,37 @@
         <a href="tel:+976-86-999-128" class="phone-link">☎ +976 86-999-128</a>
         <a href="tel:+976-88-222-803" class="phone-link">☎ +976 88-222-803</a>
       </div>
-      <button id="cartBtn" class="cart-btn" aria-label="Сагс" type="button">
-        <span class="cart-figure" aria-hidden="true">
-          <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="22" height="22">
-            <circle cx="9" cy="21" r="1"></circle>
-            <circle cx="20" cy="21" r="1"></circle>
-            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-          </svg>
-        </span>
-        <span class="cart-label" data-i18n="cart_title">Сагс</span>
-        <span id="cartCount" class="cart-count">0</span>
-      </button>
-      <button id="trackingBtn" class="cart-btn" aria-label="Захиалгын хяналт" type="button" title="Захиалгын хяналт">
-        <span class="cart-figure" aria-hidden="true">📦</span>
-        <span class="cart-label">Хяналт</span>
-      </button>
+      
+      <!-- Search Section -->
+      <div class="header-search">
+        <input 
+          type="text" 
+          id="searchInput" 
+          class="search-input" 
+          placeholder="🔍 Бүтээгдэхүүнээр хайх..." 
+          aria-label="Бүтээгдэхүүнээр хайх"
+        />
+        <div id="searchResults" class="search-results hidden"></div>
+      </div>
+      
+      <!-- Actions Section -->
+      <div class="header-actions">
+        <button id="cartBtn" class="cart-btn" aria-label="Сагс" type="button">
+          <span class="cart-figure" aria-hidden="true">
+            <svg class="cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" width="22" height="22">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+          </span>
+          <span class="cart-label" data-i18n="cart_title">Сагс</span>
+          <span id="cartCount" class="cart-count">0</span>
+        </button>
+        <button id="trackingBtn" class="cart-btn" aria-label="Захиалгын хяналт" type="button" title="Захиалгын хяналт">
+          <span class="cart-figure" aria-hidden="true">📦</span>
+          <span class="cart-label">Хяналт</span>
+        </button>
+      </div>
     </div>
   </header>
 
