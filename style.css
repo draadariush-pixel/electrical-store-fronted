@@ -27,13 +27,14 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;background:var(--
   position: relative;
 }
 
-/* Header bottom row with search and actions */
 .header-search {
   width: 100%;
   margin-top: 1rem;
   flex: 1;
   display: flex;
   justify-content: center;
+  position: relative;
+  z-index: 100;
 }
 
 .search-input {
@@ -46,6 +47,8 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;background:var(--
   color: var(--text);
   font-size: 0.9rem;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 101;
 }
 
 .search-input:focus {
@@ -66,7 +69,7 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;background:var(--
   max-width: 300px;
   max-height: 300px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 10000;
   width: calc(100% - 2rem);
 }
 
