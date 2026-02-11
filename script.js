@@ -1009,8 +1009,19 @@ function scrollToProduct(productId) {
   if (productCard) {
     console.log(`✨ Бүтээгдэхүүн #${productId} руу скролл хийж байна...`);
     
-    // Скролл хийх
-    productCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Header өндөрийг авах
+    const header = document.querySelector('.header');
+    const headerHeight = header ? header.offsetHeight : 0;
+    
+    // Бүтээгдэхүүний үзэгдэх байрлал авах
+    const elementTop = productCard.getBoundingClientRect().top + window.pageYOffset;
+    const offset = 50; // Нэмэлт зай
+    
+    // Скролл хийх (header-ийн доор)
+    window.scrollTo({
+      top: elementTop - headerHeight - offset,
+      behavior: 'smooth'
+    });
     
     // Гэрэлтүүлэх эффект - класс нэмэх (CSS анимайшен хамрах)
     productCard.classList.add('highlight-product');
