@@ -715,3 +715,102 @@ if (completePaymentBtn) {
   });
 }
 
+// ===== TRACKING FUNCTIONS =====
+
+function toggleTracking(){
+  const trackingSection = document.getElementById('trackingSection');
+  trackingSection.classList.toggle('hidden');
+  if(!trackingSection.classList.contains('hidden')){
+    document.body.style.overflow = 'hidden';
+    document.getElementById('trackingCodeInput').focus();
+  } else {
+    document.body.style.overflow = 'auto';
+  }
+}
+
+let trackingPollingInterval = null;
+
+function handleTrackingSearch(){
+  const trackingCode = document.getElementById('trackingCodeInput').value.trim().toUpperCase();
+  
+  if (!trackingCode) {
+    alert('Захиалгын кодыг оруулна уу!');
+    return;
+  }
+
+  document.getElementById('trackingForm').style.display = 'none';
+  document.getElementById('trackingResult').style.display = 'none';
+  document.getElementById('trackingError').style.display = 'none';
+  document.getElementById('trackingLoading').style.display = 'block';
+
+  fetchTrackingData(trackingCode);
+
+  // Polling: 3 секунд тутам
+  if (trackingPollingInterval) clearInterval(trackingPollingInterval);
+  trackingPollingInterval = setInterval(() => fetchTrackingData(trackingCode), 3000);
+}
+
+async function fetchTrackingData(trackingCode) {
+  try {
+    const response = await fetch(`https://electrical-store-backend.onrender.com/track/${encodeURIComponent(trackingCode)}`);
+    const data = await response.json();
+
+    document.getElementById('trackingLoading').style.display = 'none';
+
+    if (data.success) {
+      const order = data.order;
+      
+      document.getElementById('trackingCodeDisplay').textContent = order.trackingCode;
+      document.getElementById('trackingNameDisplay').textContent = order.name;
+      document.getElementById('trackingAddressDisplay').textContent = order.address;
+      document.getElementById('trackingStatusDisplay').textContent = order.statusText;
+
+      updateTrackingTimeline(order.status);
+
+      document.getElementById('trackingResult').style.display = 'block';
+      document.getElementById('trackingError').style.display = 'none';
+
+      // Хүргэгдсэн эсвэл цуцлагдсан болсон үед polling зогс
+      if (order.status === 'done' || order.status === 'cancel') {
+        clearInterval(trackingPollingInterval);
+      }
+    } else {
+      document.getElementById('trackingErrorText').textContent = 'Захиалга олдсонгүй. Кодыг зөв оруулсан эсэхийг шалгана уу.';
+      document.getElementById('trackingError').style.display = 'block';
+      document.getElementById('trackingResult').style.display = 'none';
+      clearInterval(trackingPollingInterval);
+      document.getElementById('trackingForm').style.display = 'flex';
+    }
+  } catch (err) {
+    console.error('Tracking error:', err);
+    // Continue polling on error
+  }
+}
+
+function updateTrackingTimeline(status) {
+  const statuses = ['pending', 'shi', 'ready', 'done'];
+  const statusIndex = statuses.indexOf(status);
+
+  const timelineHtml = `
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 0 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
+      <span>⏳ Сахилж буй</span>
+    </div>
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 1 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
+      <span>📦 Хүргэлт гарсан</span>
+    </div>
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 2 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
+      <span>🚚 Замдаа явж байна</span>
+    </div>
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 3 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
+      <span>✅ Хүргэгдсэн</span>
+    </div>
+  `;
+  
+  document.getElementById('trackingTimeline').innerHTML = timelineHtml;
+}
+
+
