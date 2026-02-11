@@ -1003,6 +1003,18 @@ function fuzzyMatch(query, text) {
   return -1;
 }
 
+// ========== Scroll to Product Function ==========
+function scrollToProduct(productId) {
+  const productCard = document.querySelector(`[data-product-id="${productId}"]`);
+  if (productCard) {
+    productCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Гэрэлтүүлэх эффект
+    productCard.style.animation = 'highlight 1s ease';
+  } else {
+    console.warn(`❌ Бүтээгдэхүүн #${productId} олдсонгүй`);
+  }
+}
+
 // ========== Product Search Functionality ==========
 function setupSearchListeners() {
   const searchInput = document.getElementById('searchInput');
@@ -1043,11 +1055,21 @@ function setupSearchListeners() {
     
     // Хайлтын үр дүнг харуулах (эрэмбэлсэн)
     searchResults.innerHTML = filtered.map(item => `
-      <div class="search-result-item" onclick="scrollToProduct(${item.product.id}); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('searchInput').value = '';">
+      <div class="search-result-item" data-product-id="${item.product.id}">
         <div class="search-result-name">${item.product.name}</div>
         <div class="search-result-price">₮${item.product.price.toLocaleString('mn-MN')}</div>
       </div>
     `).join('');
+    
+    // Үр дүнгийн дээр event listener нэмэх
+    document.querySelectorAll('.search-result-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const productId = parseInt(item.dataset.productId);
+        scrollToProduct(productId);
+        searchResults.classList.add('hidden');
+        searchInput.value = '';
+      });
+    });
     
     searchResults.classList.remove('hidden');
   });
