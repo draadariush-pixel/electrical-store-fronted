@@ -773,16 +773,14 @@ let currentTrackingCode = null;
 
 function handleTrackingSearch(){
   const trackingCode = document.getElementById('trackingCodeInput').value.trim().toUpperCase();
-  const customerTelegramId = document.getElementById('customerTelegramId').value.trim();
   
   if (!trackingCode) {
     alert('Захиалгын кодыг оруулна уу!');
     return;
   }
 
-  // Tracking code + customer ID хадгалах
+  // Tracking code хадгалах
   currentTrackingCode = trackingCode;
-  appState.customerTelegramId = customerTelegramId;
 
   document.getElementById('trackingForm').style.display = 'none';
   document.getElementById('trackingResult').style.display = 'none';
