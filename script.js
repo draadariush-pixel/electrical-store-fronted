@@ -584,6 +584,12 @@ function showQRModal(){
 function completePayment() {
   console.log("completePayment ажиллаж байна ✅");
 
+  // Дахин дуудагдахаас сахих
+  if (appState.orderIdInProgress) {
+    console.warn("⚠️ Order already in progress");
+    return;
+  }
+
   const phone = document.getElementById('phoneInput').value;
   const address = document.getElementById('addressInput').value;
   const notes = document.getElementById('notesInput').value;
@@ -593,6 +599,9 @@ function completePayment() {
     return;
   }
   
+  // OrderId үүсгүүлж хадгалаж, дахин processing байхыг зэмэлшүүлэх
+  const orderId = Date.now();
+  appState.orderIdInProgress = orderId;
   const subtotal = getCartTotal();
   const delivery = 5000;
   const total = subtotal + delivery;
@@ -625,9 +634,10 @@ ${productList}
 ⚠️ Та байгууллагын дансанд төлбөр төлөгдсөн эсэхийг шалгана уу!
 `;
 
-  sendTelegramMessage(message, (trackingCode) => {
+  sendTelegramMessage(message, orderId, (trackingCode) => {
     // Callback - tracking code авсны дараа
     appState.trackingCode = trackingCode; // Tracking code хадгалах
+    appState.orderIdInProgress = null; // Flag сэргээх
     
     // Сагсыг цэвэрлэх
     appState.cart = [];
@@ -674,12 +684,13 @@ ${productList}
 
 let lastSentOrderId = null; // Duplicate prevention
 
-function sendTelegramMessage(message, callback) {
-    const orderId = Date.now(); // Захиалгын unique ID
-    
+function sendTelegramMessage(message, orderId, callback) {
   // Duplicate check - нэг orderId л нэг удаа явуулна
   if (lastSentOrderId === orderId) {
     console.warn("⚠️ Duplicate order ID - skipping");
+    if (callback && typeof callback === 'function') {
+      callback(null);
+    }
     return;
   }
   lastSentOrderId = orderId;
