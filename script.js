@@ -504,8 +504,9 @@ function showQRModal(){
   }
 }
 
-function completePayment(){
-    console.log("completePayment ажиллаж байна ✅");
+function completePayment() {
+  console.log("completePayment ажиллаж байна ✅");
+
   const phone = document.getElementById('phoneInput').value;
   const address = document.getElementById('addressInput').value;
   const notes = document.getElementById('notesInput').value;
@@ -518,7 +519,7 @@ function completePayment(){
   const subtotal = getCartTotal();
   const delivery = 5000;
   const total = subtotal + delivery;
-  const productList = appState.cart.map(item => 
+  const productList = appState.cart.map(item =>
   `• ${item.name} x${item.quantity} = ₮${formatPrice(item.price * item.quantity)}`
 ).join("\n");
 
@@ -527,9 +528,10 @@ function completePayment(){
 
 👤 Захиалагч: ${appState.customerInfo?.name || "Нэр оруулаагүй"}
 
-💳 Төлбөр дуусав!
+
 
 📞 Утас: ${phone}
+
 📍 Хүргэлтийн хаяг: ${address}
 
 📝 Нэмэлт мэдээлэл:
@@ -582,46 +584,66 @@ ${productList}
   if(!elements.cartSection.classList.contains('hidden')) toggleCart();
 }
 function sendTelegramMessage(message) {
-  fetch("https://electrical-store-backend.onrender.com/send", {
+    const orderId = Date.now(); // Захиалгын unique ID  
+  fetch("https://electrical-store-backend.onrender.com/send-telegram", {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json"  
     },
-    body: JSON.stringify({ message }) // 
+    body: JSON.stringify({ message: message, orderId: orderId  })  
   })
   .then(res => res.json())
   .then(data => {
-    console.log("Render OK:", data);
+    console.log("Telegram OK:", data);
     alert("Захиалга амжилттай илгээгдлээ ✅");
   })
   .catch(err => {
-    console.error("Render ERROR:", err);
+    console.error("Telegram ERROR:", err);
     alert("Алдаа гарлаа ❌ Console шалгана уу");
   });
 }
 
-document.getElementById("orderBtn").addEventListener("click", function () {
-  console.log("Захиалга илгээх товч дарлаа ✅");
+// Payment form submit эвент
+const paymentFormEl = document.getElementById("paymentForm");
+if (paymentFormEl) {
+  paymentFormEl.addEventListener("submit", function (e) {
+    e.preventDefault();
+    console.log("Payment form submit ✅");
 
-  const name = document.getElementById("nameInput").value.trim();
-  const phone = document.getElementById("phoneInput").value.trim();
-  const address = document.getElementById("addressInput").value.trim();
-  const notes = document.getElementById("notesInput").value.trim();
+    const nameEl = document.getElementById("nameInput") || {};
+    const phoneEl = document.getElementById("phoneInput") || {};
+    const addressEl = document.getElementById("addressInput") || {};
+    const notesEl = document.getElementById("notesInput") || {};
 
-  if (!name || !phone || !address) {
-    alert("Нэр, утас, хаяг оруулна уу!");
-    return;
-  }
+    const name = (nameEl.value || '').trim();
+    const phone = (phoneEl.value || '').trim();
+    const address = (addressEl.value || '').trim();
+    const notes = (notesEl.value || '').trim();
 
-  // хэрэглэгчийн мэдээлэл хадгалах
-  appState.customerInfo = { name, phone, address, notes };
+    if (!name || !phone || !address) {
+      alert("Нэр, утас, хаяг оруулна уу!");
+      return;
+    }
 
-  // payment modal хаах
-  document.getElementById("paymentModal").classList.add("hidden");
+    // хэрэглэгчийн мэдээлэл хадгалах
+    appState.customerInfo = { name, phone, address, notes };
 
-  // QR modal нээх
-  showQRModal();
-  document.getElementById("qrModal").classList.remove("hidden");
-});
+    // payment modal хаах
+    const paymentModalEl = document.getElementById("paymentModal");
+    if (paymentModalEl) paymentModalEl.classList.add("hidden");
 
+    // QR modal нээх
+    showQRModal();
+    const qrModalEl = document.getElementById("qrModal");
+    if (qrModalEl) qrModalEl.classList.remove("hidden");
+  });
+}
+
+// Complete payment button эвент
+const completePaymentBtn = document.getElementById("completePayment");
+if (completePaymentBtn) {
+  completePaymentBtn.addEventListener("click", function () {
+    completePayment();
+  });
+}
 
