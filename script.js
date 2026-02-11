@@ -798,15 +798,9 @@ async function fetchTrackingData(trackingCode) {
 
     if (data.success) {
       const order = data.order;
-      
-      document.getElementById('trackingCodeDisplay').textContent = order.trackingCode;
-      document.getElementById('trackingNameDisplay').textContent = order.name;
-      document.getElementById('trackingAddressDisplay').textContent = order.address;
-      document.getElementById('trackingStatusDisplay').textContent = order.statusText;
 
       updateTrackingTimeline(order.status);
 
-      document.getElementById('trackingResult').style.display = 'block';
       document.getElementById('trackingError').style.display = 'none';
 
       // Хүргэгдсэн эсвэл цуцлагдсан болсон үед polling зогс
@@ -816,7 +810,6 @@ async function fetchTrackingData(trackingCode) {
     } else {
       document.getElementById('trackingErrorText').textContent = 'Захиалга олдсонгүй. Кодыг зөв оруулсан эсэхийг шалгана уу.';
       document.getElementById('trackingError').style.display = 'block';
-      document.getElementById('trackingResult').style.display = 'none';
       clearInterval(trackingPollingInterval);
       document.getElementById('trackingForm').style.display = 'flex';
     }
