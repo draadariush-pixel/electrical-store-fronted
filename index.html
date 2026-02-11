@@ -245,9 +245,23 @@
       <div id="confirmModal" class="modal hidden">
         <div class="modal-content">
           <button id="closeConfirmModal" class="modal-close">✕</button>
-          <h2>Төлбөр баталгаажих тухай</h2>
+          <h2>Захиалга баталгаажуулсан ✅</h2>
           
-          <p id="confirmText">Төлбөр баталгаажихад 5-10 минут зарцуулагдах ба баталгаажсны дараа таны утсанд SMS илгээгдэх болно.</p>
+          <div style="background: #e8f5e9; border: 2px solid #4caf50; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+            <p style="margin: 0 0 10px 0; font-size: 14px; color: #333;">Таны захиалгын код:</p>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+              <code id="confirmTrackingCode" style="font-size: 24px; font-weight: bold; color: #ff6b35; letter-spacing: 2px; background: white; padding: 10px 20px; border-radius: 4px; border: 2px solid #ff6b35;">-</code>
+              <button id="copyTrackingCodeBtn" type="button" class="copy-btn-sm" data-copy="confirmTrackingCode" title="Кодыг хуулах" style="font-size: 20px; padding: 8px 12px;">📋</button>
+            </div>
+          </div>
+
+          <div style="background: #fff3e0; border-left: 4px solid #ff9800; padding: 15px; border-radius: 4px; margin: 15px 0;">
+            <p style="margin: 0; font-size: 13px; color: #333;">
+              <strong>⚠️ Анхаарна уу:</strong> Дээрх кодыг хуулж, "📦 Хяналт" хэсэгт оруулан захиалгын явцыг шалгаж болно.
+            </p>
+          </div>
+
+          <p id="confirmText" style="font-size: 13px; color: #666; margin: 15px 0;">Төлбөр баталгаажихад 5-10 минут зарцуулагдах ба баталгаажсны дараа таны утсанд SMS илгээгдэх болно.</p>
           <div class="modal-actions">
             <button id="confirmOkBtn" class="btn btn-primary btn-full">Хаах</button>
           </div>

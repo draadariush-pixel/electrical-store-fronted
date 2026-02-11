@@ -133,6 +133,26 @@ function setupListeners(){
     document.getElementById('trackingForm').style.display = 'flex';
     trackingCodeInput.focus();
   });
+  
+  // Copy tracking code button
+  const copyTrackingCodeBtn = document.getElementById('copyTrackingCodeBtn');
+  if (copyTrackingCodeBtn) {
+    copyTrackingCodeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const trackingCode = document.getElementById('confirmTrackingCode').textContent;
+      if (trackingCode && trackingCode !== '-') {
+        navigator.clipboard.writeText(trackingCode).then(() => {
+          const btn = e.currentTarget;
+          btn.classList.add('copied');
+          btn.textContent = '✓';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.textContent = '📋';
+          }, 2000);
+        }).catch(err => console.error('Copy error:', err));
+      }
+    });
+  }
 }
 
 // Бүтээгдэхүүнүүдийг буулгах
@@ -364,116 +384,6 @@ function toggleCart(){
   } else document.body.style.overflow = 'auto';
 }
 
-function toggleTracking(){
-  const trackingSection = document.getElementById('trackingSection');
-  trackingSection.classList.toggle('hidden');
-  if(!trackingSection.classList.contains('hidden')){
-    document.body.style.overflow = 'hidden';
-    document.getElementById('trackingCodeInput').focus();
-  } else {
-    document.body.style.overflow = 'auto';
-  }
-}
-
-let trackingPollingInterval = null;
-
-function handleTrackingSearch(){
-  const trackingCode = document.getElementById('trackingCodeInput').value.trim().toUpperCase();
-  
-  if (!trackingCode) {
-    alert('Захиалгын кодыг оруулна уу!');
-    return;
-  }
-
-  document.getElementById('trackingForm').style.display = 'none';
-  document.getElementById('trackingResult').style.display = 'none';
-  document.getElementById('trackingError').style.display = 'none';
-  document.getElementById('trackingLoading').style.display = 'block';
-
-  fetchTrackingData(trackingCode);
-
-  // Polling: 3 секунд тутам
-  if (trackingPollingInterval) clearInterval(trackingPollingInterval);
-  trackingPollingInterval = setInterval(() => fetchTrackingData(trackingCode), 3000);
-}
-
-async function fetchTrackingData(trackingCode) {
-  try {
-    const response = await fetch(`https://electrical-store-backend.onrender.com/track/${encodeURIComponent(trackingCode)}`);
-    const data = await response.json();
-
-    document.getElementById('trackingLoading').style.display = 'none';
-
-    if (data.success) {
-      const order = data.order;
-      
-      document.getElementById('trackingCodeDisplay').textContent = order.trackingCode;
-      document.getElementById('trackingNameDisplay').textContent = order.name;
-      document.getElementById('trackingAddressDisplay').textContent = order.address;
-      document.getElementById('trackingStatusDisplay').textContent = order.statusText;
-
-      updateTrackingTimeline(order.status);
-
-      document.getElementById('trackingResult').style.display = 'block';
-      document.getElementById('trackingError').style.display = 'none';
-
-      // Хүргэгдсэн эсвэл цуцлагдсан болсон үед polling зогс
-      if (order.status === 'done' || order.status === 'cancel') {
-        clearInterval(trackingPollingInterval);
-      }
-    } else {
-      document.getElementById('trackingErrorText').textContent = 'Захиалга олдсонгүй. Кодыг зөв оруулсан эсэхийг шалгана уу.';
-      document.getElementById('trackingError').style.display = 'block';
-      document.getElementById('trackingResult').style.display = 'none';
-      clearInterval(trackingPollingInterval);
-      document.getElementById('trackingForm').style.display = 'flex';
-    }
-  } catch (err) {
-    console.error('Tracking error:', err);
-    // Continue polling on error
-  }
-}
-
-function updateTrackingTimeline(status) {
-  const statuses = ['pending', 'shi', 'ready', 'done'];
-  const statusIndex = statuses.indexOf(status);
-
-  const timeline = [
-    { dot: document.querySelector('[data-status="pending"]') || createTimelineDot('pending'), text: '⏳ Сахилж буй' },
-    { dot: document.querySelector('[data-status="shi"]') || createTimelineDot('shi'), text: '📦 Хүргэлт гарсан' },
-    { dot: document.querySelector('[data-status="ready"]') || createTimelineDot('ready'), text: '🚚 Замдаа явж байна' },
-    { dot: document.querySelector('[data-status="done"]') || createTimelineDot('done'), text: '✅ Хүргэгдсэн' }
-  ];
-
-  // Simple update for inline styles
-  const timelineHtml = `
-    <div style="display: flex; align-items: center; margin: 8px 0;">
-      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 0 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-      <span>⏳ Сахилж буй</span>
-    </div>
-    <div style="display: flex; align-items: center; margin: 8px 0;">
-      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 1 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-      <span>📦 Хүргэлт гарсан</span>
-    </div>
-    <div style="display: flex; align-items: center; margin: 8px 0;">
-      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 2 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-      <span>🚚 Замдаа явж байна</span>
-    </div>
-    <div style="display: flex; align-items: center; margin: 8px 0;">
-      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 3 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-      <span>✅ Хүргэгдсэн</span>
-    </div>
-  `;
-  
-  document.getElementById('trackingTimeline').innerHTML = timelineHtml;
-}
-
-function createTimelineDot(status) {
-  const dot = document.createElement('span');
-  dot.setAttribute('data-status', status);
-  return dot;
-}
-
 function handleCheckout(){
   if(appState.cart.length === 0){
     alert('Сагс хоосон байна!');
@@ -675,44 +585,52 @@ ${productList}
 ✅ Төлөх дүн: ₮${formatPrice(total)}
 `;
 
-  sendTelegramMessage(message);
+  sendTelegramMessage(message, (trackingCode) => {
+    // Callback - tracking code авсны дараа
+    
+    // Сагсыг цэвэрлэх
+    appState.cart = [];
+    appState.productQuantities = {};
+    products.forEach(p => appState.productQuantities[p.id] = 0);
 
-  // Сагсыг цэвэрлэх
-  appState.cart = [];
-  appState.productQuantities = {};
-  products.forEach(p => appState.productQuantities[p.id] = 0);
+    // Modal хаах
+    document.getElementById('qrModal').classList.add('hidden');
 
-  // Modal хаах
-  document.getElementById('qrModal').classList.add('hidden');
+    // Харуулах: сайтын стильд тохирсон баталгаажуулалтын модаль
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmTextEl = document.getElementById('confirmText');
+    const confirmCodeEl = document.getElementById('confirmTrackingCode');
+    
+    if(confirmCodeEl && trackingCode) {
+      confirmCodeEl.textContent = trackingCode;
+    }
+    
+    if(confirmTextEl) confirmTextEl.textContent = 'Төлбөр баталгаажихад 5-10 минут зарцуулагдах ба баталгаажсны дараа таны утсанд SMS илгээгдэх болно';
+    if(confirmModal){
+      confirmModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
 
-  // Харуулах: сайтын стильд тохирсон баталгаажуулалтын модаль
-  const confirmModal = document.getElementById('confirmModal');
-  const confirmTextEl = document.getElementById('confirmText');
-  if(confirmTextEl) confirmTextEl.textContent = 'Төлбөр баталгаажихад 5-10 минут зарцуулагдах ба баталгаажсны дараа таны утсанд SMS илгээгдэх болно';
-  if(confirmModal){
-    confirmModal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
+      const hideConfirm = () => {
+        confirmModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      };
 
-    const hideConfirm = () => {
-      confirmModal.classList.add('hidden');
-      document.body.style.overflow = 'auto';
-    };
+      document.getElementById('closeConfirmModal').onclick = hideConfirm;
+      document.getElementById('confirmOkBtn').onclick = hideConfirm;
 
-    document.getElementById('closeConfirmModal').onclick = hideConfirm;
-    document.getElementById('confirmOkBtn').onclick = hideConfirm;
+      // Автоматаар хаагдах (20 секунд)
+      setTimeout(hideConfirm, 20000);
+    }
 
-    // Автоматаар хаагдах (20 секунд)
-    setTimeout(hideConfirm, 20000);
-  }
-
-  // Дэлгэцийг шинэчлэх
-  renderProducts();
-  renderCart();
-  updateCartCount();
-  // Хэрэглэгч сагс дэлгэцийг хаах
-  if(!elements.cartSection.classList.contains('hidden')) toggleCart();
+    // Дэлгэцийг шинэчлэх
+    renderProducts();
+    renderCart();
+    updateCartCount();
+    // Хэрэглэгч сагс дэлгэцийг хаах
+    if(!elements.cartSection.classList.contains('hidden')) toggleCart();
+  });
 }
-function sendTelegramMessage(message) {
+function sendTelegramMessage(message, callback) {
     const orderId = Date.now(); // Захиалгын unique ID  
   const phone = (document.getElementById('phoneInput') || {}).value || '';
   const name = appState.customerInfo?.name || '';
@@ -734,15 +652,22 @@ function sendTelegramMessage(message) {
       console.log("📍 Tracking Link:", trackingUrl);
       console.log("📱 Tracking Code:", data.trackingCode);
       
-      // Alert-д tracking code харуулах
-      alert(`Захиалга амжилттай илгээгдлээ ✅\n\nТаны захиалгын код: ${data.trackingCode}\n\nХүргэлтийн явцыг шалгах:\n${trackingUrl}`);
+      // Callback дуудаж tracking code дамжуулах
+      if (callback && typeof callback === 'function') {
+        callback(data.trackingCode);
+      }
     } else {
-      alert("Захиалга амжилттай илгээгдлээ ✅");
+      if (callback && typeof callback === 'function') {
+        callback(null);
+      }
     }
   })
   .catch(err => {
     console.error("Telegram ERROR:", err);
     alert("Алдаа гарлаа ❌ Console шалгана уу");
+    if (callback && typeof callback === 'function') {
+      callback(null);
+    }
   });
 }
 
