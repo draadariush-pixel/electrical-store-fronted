@@ -671,8 +671,19 @@ ${productList}
     if(!elements.cartSection.classList.contains('hidden')) toggleCart();
   });
 }
+
+let lastSentOrderId = null; // Duplicate prevention
+
 function sendTelegramMessage(message, callback) {
-    const orderId = Date.now(); // Захиалгын unique ID  
+    const orderId = Date.now(); // Захиалгын unique ID
+    
+  // Duplicate check - нэг orderId л нэг удаа явуулна
+  if (lastSentOrderId === orderId) {
+    console.warn("⚠️ Duplicate order ID - skipping");
+    return;
+  }
+  lastSentOrderId = orderId;
+  
   const phone = (document.getElementById('phoneInput') || {}).value || '';
   const name = appState.customerInfo?.name || '';
   const address = appState.customerInfo?.address || '';
