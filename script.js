@@ -830,70 +830,24 @@ function updateTrackingTimeline(status) {
   const statusIndex = statuses.indexOf(status);
 
   const timelineHtml = `
-    <div style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
-      <div style="display: flex; align-items: center;">
-        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 0 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-        <span>⏳ Захиалга бэлдэж байна</span>
-      </div>
-      <button class="status-btn" data-status="pending" style="padding: 4px 8px; font-size: 11px; background: ${status === 'pending' ? '#ff6b35' : '#f0f0f0'}; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; color: ${status === 'pending' ? 'white' : '#333'};">Сонго</button>
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 0 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
+      <span>⏳ Захиалга бэлдэж байна</span>
     </div>
-    <div style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
-      <div style="display: flex; align-items: center;">
-        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 1 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-        <span>📦 Хүргэлт гарсан</span>
-      </div>
-      <button class="status-btn" data-status="shi" style="padding: 4px 8px; font-size: 11px; background: ${status === 'shi' ? '#ff6b35' : '#f0f0f0'}; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; color: ${status === 'shi' ? 'white' : '#333'};">Сонго</button>
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 1 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
+      <span>📦 Хүргэлт гарсан</span>
     </div>
-    <div style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
-      <div style="display: flex; align-items: center;">
-        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 2 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-        <span>🚚 Замдаа явж байна</span>
-      </div>
-      <button class="status-btn" data-status="ready" style="padding: 4px 8px; font-size: 11px; background: ${status === 'ready' ? '#ff6b35' : '#f0f0f0'}; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; color: ${status === 'ready' ? 'white' : '#333'};">Сонго</button>
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 2 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
+      <span>🚚 Замдаа явж байна</span>
     </div>
-    <div style="display: flex; align-items: center; justify-content: space-between; margin: 8px 0;">
-      <div style="display: flex; align-items: center;">
-        <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 3 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
-        <span>✅ Хүргэгдсэн</span>
-      </div>
-      <button class="status-btn" data-status="done" style="padding: 4px 8px; font-size: 11px; background: ${status === 'done' ? '#ff6b35' : '#f0f0f0'}; border: 1px solid #ddd; border-radius: 3px; cursor: pointer; color: ${status === 'done' ? 'white' : '#333'};">Сонго</button>
+    <div style="display: flex; align-items: center; margin: 8px 0;">
+      <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: ${statusIndex >= 3 ? '#4caf50' : '#ccc'}; margin-right: 8px;"></span>
+      <span>✅ Хүргэгдсэн</span>
     </div>
   `;
   
   document.getElementById('trackingTimeline').innerHTML = timelineHtml;
-  
-  // Баттоны эвент сонслогачдыг нэмэх
-  document.querySelectorAll('.status-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      updateTrackingStatus(btn.getAttribute('data-status'));
-    });
-  });
 }
-
-// Статусыг шинэчлэх функц
-async function updateTrackingStatus(newStatus) {
-  const trackingCode = document.getElementById('trackingCodeDisplay').textContent;
-  
-  try {
-    const response = await fetch(`https://electrical-store-backend.onrender.com/update-status`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        trackingCode: trackingCode,
-        status: newStatus
-      })
-    });
-    
-    const data = await response.json();
-    if (data.success) {
-      fetchTrackingData(trackingCode);
-    } else {
-      alert('Статусыг шинэчлэх боломжгүй байна');
-    }
-  } catch (err) {
-    console.error('Status update error:', err);
-    alert('Статусыг шинэчлэхэд алдаа гарлаа');
-  }
-}
-
 
