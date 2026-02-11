@@ -188,6 +188,9 @@ function setupListeners(){
       }
     });
   }
+  
+  // Search functionality
+  setupSearchListeners();
 }
 
 // Бүтээгдэхүүнүүдийг буулгах
@@ -1001,74 +1004,61 @@ function fuzzyMatch(query, text) {
 }
 
 // ========== Product Search Functionality ==========
-const searchInput = document.getElementById('searchInput');
-const searchResults = document.getElementById('searchResults');
-
-searchInput.addEventListener('input', (e) => {
-  const query = e.target.value.trim();
+function setupSearchListeners() {
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
   
-  if (query.length === 0) {
-    searchResults.classList.add('hidden');
+  if (!searchInput || !searchResults) {
+    console.error('❌ Хайлтын элементүүд олдсонгүй');
     return;
   }
   
-  // Fuzzy match ашиглан хайлтыг гүйцэтгэх
-  const filtered = products.map(product => {
-    const nameScore = fuzzyMatch(query, product.name);
-    const descScore = fuzzyMatch(query, product.description);
-    const score = Math.max(nameScore, descScore);
+  searchInput.addEventListener('input', (e) => {
+    const query = e.target.value.trim();
     
-    return {
-      product: product,
-      score: score
-    };
-  })
-  .filter(item => item.score >= 0) // матч байгаа зүйлсийг авах
-  .sort((a, b) => b.score - a.score); // оноогоор эрэмбэлэх
-  
-  if (filtered.length === 0) {
-    searchResults.innerHTML = '<div class="search-result-item" style="text-align: center; color: var(--muted);">Бүтээгдэхүүн олдсонгүй</div>';
+    if (query.length === 0) {
+      searchResults.classList.add('hidden');
+      return;
+    }
+    
+    // Fuzzy match ашиглан хайлтыг гүйцэтгэх
+    const filtered = products.map(product => {
+      const nameScore = fuzzyMatch(query, product.name);
+      const descScore = fuzzyMatch(query, product.description);
+      const score = Math.max(nameScore, descScore);
+      
+      return {
+        product: product,
+        score: score
+      };
+    })
+    .filter(item => item.score >= 0) // матч байгаа зүйлсийг авах
+    .sort((a, b) => b.score - a.score); // оноогоор эрэмбэлэх
+    
+    if (filtered.length === 0) {
+      searchResults.innerHTML = '<div class="search-result-item" style="text-align: center; color: var(--muted);">Бүтээгдэхүүн олдсонгүй</div>';
+      searchResults.classList.remove('hidden');
+      return;
+    }
+    
+    // Хайлтын үр дүнг харуулах (эрэмбэлсэн)
+    searchResults.innerHTML = filtered.map(item => `
+      <div class="search-result-item" onclick="scrollToProduct(${item.product.id}); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('searchInput').value = '';">
+        <div class="search-result-name">${item.product.name}</div>
+        <div class="search-result-price">₩${item.product.price.toLocaleString('mn-MN')}</div>
+      </div>
+    `).join('');
+    
     searchResults.classList.remove('hidden');
-    return;
-  }
+  });
   
-  // Хайлтын үр дүнг харуулах (эрэмбэлсэн)
-  searchResults.innerHTML = filtered.map(item => `
-    <div class="search-result-item" onclick="scrollToProduct(${item.product.id}); document.getElementById('searchResults').classList.add('hidden'); document.getElementById('searchInput').value = '';">
-      <div class="search-result-name">${item.product.name}</div>
-      <div class="search-result-price">₩${item.product.price.toLocaleString('mn-MN')}</div>
-    </div>
-  `).join('');
+  // Хайлт нээлттэй байхад гадны зүйл дээр клик хийхэд хаах
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.header-search') && !searchResults.classList.contains('hidden')) {
+      searchResults.classList.add('hidden');
+    }
+  });
   
-  searchResults.classList.remove('hidden');
-});
-
-// Бүтээгдэхүүн хүртэл скроллох функц
-function scrollToProduct(productId) {
-  const productCard = document.querySelector(`[data-product-id="${productId}"]`);
-  if (productCard) {
-    productCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    // Гэрэлтүүлэх эффект
-    productCard.style.animation = 'highlight 1s ease';
-  }
+  console.log('✅ Хайлт функцыг идэвхжүүлсэн: Бүтээгдэхүүнээр хайх бололцоотой');
 }
-
-// Highlight анимейшн нэмэх
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes highlight {
-    0% { background-color: rgba(255, 180, 0, 0.3); }
-    100% { background-color: transparent; }
-  }
-`;
-document.head.appendChild(style);
-
-// Хайлт нээлттэй байхад гадны зүйл дээр клик хийхэд хаах
-document.addEventListener('click', (e) => {
-  if (!e.target.closest('.header-search') && !searchResults.classList.contains('hidden')) {
-    searchResults.classList.add('hidden');
-  }
-});
-
-console.log('✅ Fuzzy search функцыг нэмсэн: Үсэгний дараадалаар хайх бололцоотой');
 
