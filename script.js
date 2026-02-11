@@ -1088,13 +1088,16 @@ function setupSearchListeners() {
     
     // Үр дүнгийн дээр event listener нэмэх
     const resultItems = document.querySelectorAll('.search-result-item[data-product-id]');
+    console.log(`📊 Хайлтын үр дүн ${resultItems.length} ширхэг олдсон`);
+    
     resultItems.forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         
         const productId = parseInt(item.dataset.productId);
-        console.log(`🔍 Хайлтын үр дүнгээс бүтээгдэхүүн ${productId} сонгосон`);
+        console.log(`🔍 Хайлтын үр дүнгээс бүтээгдэхүүн #${productId} сонгосон`);
+        console.log(`📍 Бүтээгдэхүүнийг хайж байна: [data-product-id="${productId}"]`);
         
         // Үр дүн хаах
         searchResults.classList.add('hidden');
@@ -1102,6 +1105,7 @@ function setupSearchListeners() {
         
         // Бүтээгдэхүүн хүртэл плавно скролл хийх
         setTimeout(() => {
+          console.log(`⬇️ scrollToProduct(${productId}) дуудалж байна`);
           scrollToProduct(productId);
         }, 100);
       });
