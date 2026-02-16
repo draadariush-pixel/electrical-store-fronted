@@ -670,9 +670,6 @@ ${productList}
 
       document.getElementById('closeConfirmModal').onclick = hideConfirm;
       document.getElementById('confirmOkBtn').onclick = hideConfirm;
-
-      // Автоматаар хаагдах (20 секунд)
-      setTimeout(hideConfirm, 20000);
     }
 
     // Дэлгэцийг шинэчлэх
